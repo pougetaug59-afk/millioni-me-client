@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Pirates Paradise — Compteur Millionième Client</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Trade+Winds&family=Cardo:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --navy-deep: #121525;
+  --navy: #052644;
+  --gold: #F69614;
+  --gold-soft: #ffb14a;
+  --teal: #32B6B0;
+  --cream: #FDF5E6;
+  --shadow-deep: rgba(0, 0, 0, 0.6);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: 'Cardo', serif;
+  color: var(--cream);
+  background: radial-gradient(ellipse at top, var(--navy) 0%, var(--navy-deep) 70%);
+  position: relative;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Fond carte au trésor : grain + roses des vents subtiles */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 15% 20%, rgba(246, 150, 20, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 85% 80%, rgba(50, 182, 176, 0.06) 0%, transparent 40%),
+    repeating-linear-gradient(45deg, transparent 0, transparent 100px, rgba(253, 245, 230, 0.015) 100px, rgba(253, 245, 230, 0.015) 101px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence baseFrequency='0.9' /></filter><rect width='200' height='200' filter='url(%23n)' opacity='0.4'/></svg>");
+  opacity: 0.04;
+  pointer-events: none;
+  z-index: 1;
+  mix-blend-mode: overlay;
+}
+
+.app {
+  position: relative;
+  z-index: 2;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: clamp(16px, 3vh, 32px) clamp(16px, 4vw, 48px);
+}
+
+/* ===== HEADER ===== */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.brand-mark {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-soft) 100%);
+  display: grid;
+  place-items: center;
+  box-shadow: 0 4px 20px rgba(246, 150, 20, 0.3), inset 0 -3px 8px rgba(0,0,0,0.2);
+  position: relative;
+}
+
+.brand-mark::after {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  border: 1px dashed rgba(0,0,0,0.3);
+}
+
+.brand-mark svg {
+  width: 30px;
+  height: 30px;
+  fill: var(--navy-deep);
+}
+
+.brand-text h1 {
+  font-family: 'Trade Winds', cursive;
+  font-size: 22px;
+  color: var(--gold);
+  font-weight: 400;
+  letter-spacing: 1px;
+  line-height: 1;
+}
+
+.brand-text p {
+  font-family: 'Cardo', serif;
+  font-size: 11px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--cream);
+  opacity: 0.7;
+  margin-top: 4px;
+}
+
+.settings-btn {
+  background: rgba(253, 245, 230, 0.05);
+  border: 1px solid rgba(246, 150, 20, 0.3);
+  color: var(--gold);
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.settings-btn:hover {
+  background: rgba(246, 150, 20, 0.1);
+  transform: rotate(45deg);
+  border-color: var(--gold);
+}
+
+.settings-btn svg { width: 22px; height: 22px; }
+
+/* ===== MAIN ===== */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  position: relative;
+  min-height: 0;
+}
+
+.label {
+  font-family: 'Cardo', serif;
+  font-style: italic;
+  font-size: clamp(14px, 1.6vw, 18px);
+  color: var(--teal);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: clamp(8px, 1.5vh, 16px);
+  opacity: 0.85;
+}
+
+.label::before, .label::after {
+  content: "✦";
+  margin: 0 14px;
+  color: var(--gold);
+}
+
+.counter-wrap {
+  position: relative;
+  margin-bottom: clamp(16px, 3vh, 32px);
+}
+
+.counter {
+  font-family: 'Trade Winds', cursive;
+  font-size: clamp(72px, 16vw, 220px);
+  color: var(--gold);
+  line-height: 1;
+  letter-spacing: 4px;
+  text-shadow:
+    0 0 40px rgba(246, 150, 20, 0.4),
+    0 4px 0 rgba(0,0,0,0.3),
+    0 8px 30px rgba(0,0,0,0.5);
+  position: relative;
+  display: inline-block;
+  transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.counter.bump {
+  transform: scale(1.04);
+}
+
+.target {
+  font-family: 'Cardo', serif;
+  font-style: italic;
+  font-size: clamp(16px, 1.8vw, 22px);
+  color: var(--cream);
+  opacity: 0.6;
+  margin-top: 8px;
+}
+
+.target strong {
+  color: var(--teal);
+  font-weight: 700;
+  font-style: normal;
+}
+
+/* ===== PROGRESS ===== */
+.progress-container {
+  width: min(720px, 90%);
+  margin-bottom: clamp(20px, 3.5vh, 40px);
+}
+
+.progress-bar {
+  height: 14px;
+  background: rgba(253, 245, 230, 0.08);
+  border: 1px solid rgba(246, 150, 20, 0.2);
+  border-radius: 100px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.4);
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--teal) 0%, var(--gold) 60%, var(--gold-soft) 100%);
+  border-radius: 100px;
+  width: 0%;
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  box-shadow: 0 0 20px rgba(246, 150, 20, 0.5);
+}
+
+.progress-fill::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.progress-label {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-size: 13px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+
+/* ===== CLICK BUTTON ===== */
+.click-btn {
+  position: relative;
+  font-family: 'Trade Winds', cursive;
+  font-size: clamp(18px, 2.2vw, 26px);
+  letter-spacing: 3px;
+  color: var(--navy-deep);
+  background: linear-gradient(180deg, var(--gold-soft) 0%, var(--gold) 50%, #d97f0a 100%);
+  border: none;
+  padding: clamp(18px, 2.5vh, 26px) clamp(40px, 5vw, 64px);
+  border-radius: 100px;
+  cursor: pointer;
+  box-shadow:
+    0 6px 0 #a85e08,
+    0 12px 30px rgba(246, 150, 20, 0.4),
+    inset 0 2px 4px rgba(255, 255, 255, 0.4);
+  transition: transform 0.08s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.08s ease;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+  overflow: visible;
+}
+
+.click-btn:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 8px 0 #a85e08,
+    0 16px 40px rgba(246, 150, 20, 0.5),
+    inset 0 2px 4px rgba(255, 255, 255, 0.5);
+}
+
+.click-btn:active {
+  transform: translateY(4px);
+  box-shadow:
+    0 2px 0 #a85e08,
+    0 4px 12px rgba(246, 150, 20, 0.3),
+    inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.click-btn::before {
+  content: "✦";
+  margin-right: 14px;
+  color: var(--navy-deep);
+}
+
+.click-btn::after {
+  content: "✦";
+  margin-left: 14px;
+  color: var(--navy-deep);
+}
+
+/* Particules au clic */
+.particle {
+  position: fixed;
+  pointer-events: none;
+  font-size: 24px;
+  z-index: 100;
+  animation: particle-fly 1s ease-out forwards;
+}
+
+@keyframes particle-fly {
+  0% { opacity: 1; transform: translate(-50%, -50%) scale(0.5); }
+  100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(1.4); }
+}
+
+/* ===== STATS FOOTER ===== */
+.footer-stats {
+  display: flex;
+  gap: clamp(16px, 3vw, 40px);
+  margin-top: clamp(20px, 3vh, 32px);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.stat {
+  text-align: center;
+  padding: 12px 24px;
+  background: rgba(253, 245, 230, 0.04);
+  border: 1px solid rgba(253, 245, 230, 0.08);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  min-width: 140px;
+}
+
+.stat-label {
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  opacity: 0.6;
+  color: var(--teal);
+}
+
+.stat-value {
+  font-family: 'Trade Winds', cursive;
+  font-size: 22px;
+  color: var(--cream);
+  margin-top: 4px;
+}
+
+/* ===== MODAL SETTINGS ===== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  animation: fade-in 0.3s ease;
+}
+
+.modal-overlay.show { display: flex; }
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal {
+  background: linear-gradient(135deg, var(--navy) 0%, var(--navy-deep) 100%);
+  border: 1px solid rgba(246, 150, 20, 0.3);
+  border-radius: 16px;
+  padding: 36px;
+  max-width: 460px;
+  width: 90%;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+  animation: slide-up 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.modal h2 {
+  font-family: 'Trade Winds', cursive;
+  color: var(--gold);
+  font-size: 24px;
+  margin-bottom: 24px;
+  letter-spacing: 2px;
+}
+
+.field {
+  margin-bottom: 20px;
+}
+
+.field label {
+  display: block;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--teal);
+  margin-bottom: 8px;
+}
+
+.field input[type="number"] {
+  width: 100%;
+  padding: 12px 16px;
+  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(246, 150, 20, 0.3);
+  border-radius: 8px;
+  color: var(--cream);
+  font-family: 'Cardo', serif;
+  font-size: 16px;
+  transition: border-color 0.2s;
+}
+
+.field input[type="number"]:focus {
+  outline: none;
+  border-color: var(--gold);
+}
+
+.toggle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.toggle input { display: none; }
+
+.toggle-track {
+  width: 48px;
+  height: 26px;
+  background: rgba(0,0,0,0.4);
+  border: 1px solid rgba(246, 150, 20, 0.3);
+  border-radius: 100px;
+  position: relative;
+  transition: background 0.2s;
+}
+
+.toggle-track::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  background: var(--cream);
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+
+.toggle input:checked + .toggle-track {
+  background: var(--gold);
+}
+
+.toggle input:checked + .toggle-track::after {
+  left: 24px;
+  background: var(--navy-deep);
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.btn {
+  flex: 1;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-family: 'Cardo', serif;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+}
+
+.btn-primary {
+  background: var(--gold);
+  color: var(--navy-deep);
+}
+.btn-primary:hover { background: var(--gold-soft); }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--cream);
+  border: 1px solid rgba(253, 245, 230, 0.2);
+}
+.btn-ghost:hover { background: rgba(253, 245, 230, 0.05); }
+
+.btn-danger {
+  background: transparent;
+  color: #ff6b6b;
+  border: 1px solid rgba(255, 107, 107, 0.3);
+}
+.btn-danger:hover { background: rgba(255, 107, 107, 0.1); }
+
+.btn-ceremony {
+  background: linear-gradient(135deg, var(--teal) 0%, #1f8a85 100%);
+  color: var(--cream);
+  font-family: 'Trade Winds', cursive;
+  letter-spacing: 2px;
+  border: 1px solid rgba(50, 182, 176, 0.4);
+  box-shadow: 0 4px 16px rgba(50, 182, 176, 0.25);
+}
+.btn-ceremony:hover {
+  background: linear-gradient(135deg, #3dc7c1 0%, var(--teal) 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(50, 182, 176, 0.35);
+}
+
+/* ===== CELEBRATION ===== */
+.celebration {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse at center, rgba(5, 38, 68, 0.95) 0%, rgba(18, 21, 37, 0.98) 100%);
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 300;
+  text-align: center;
+  padding: 20px;
+  overflow: hidden;
+}
+
+.celebration.show { display: flex; }
+
+.celebration-eyebrow {
+  font-family: 'Cardo', serif;
+  font-style: italic;
+  color: var(--teal);
+  letter-spacing: 8px;
+  text-transform: uppercase;
+  font-size: clamp(12px, 1.4vw, 16px);
+  margin-bottom: 20px;
+  opacity: 0;
+  animation: rise-fade 1s 0.3s forwards;
+}
+
+.celebration-number {
+  font-family: 'Trade Winds', cursive;
+  font-size: clamp(80px, 18vw, 280px);
+  color: var(--gold);
+  line-height: 0.9;
+  letter-spacing: 6px;
+  text-shadow:
+    0 0 60px rgba(246, 150, 20, 0.6),
+    0 4px 0 rgba(0,0,0,0.3),
+    0 10px 40px rgba(0,0,0,0.6);
+  opacity: 0;
+  transform: scale(0.5);
+  animation: zoom-in 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) 0.5s forwards;
+}
+
+.celebration-title {
+  font-family: 'Trade Winds', cursive;
+  font-size: clamp(28px, 5vw, 56px);
+  color: var(--cream);
+  letter-spacing: 4px;
+  margin-top: 16px;
+  opacity: 0;
+  animation: rise-fade 1s 1.2s forwards;
+}
+
+.celebration-message {
+  font-family: 'Cardo', serif;
+  font-style: italic;
+  font-size: clamp(16px, 1.8vw, 22px);
+  color: var(--cream);
+  opacity: 0;
+  margin-top: 20px;
+  max-width: 600px;
+  line-height: 1.6;
+  animation: rise-fade 1s 1.6s forwards;
+}
+
+.celebration-close {
+  margin-top: 36px;
+  padding: 14px 40px;
+  background: transparent;
+  border: 2px solid var(--gold);
+  color: var(--gold);
+  font-family: 'Trade Winds', cursive;
+  font-size: 16px;
+  letter-spacing: 3px;
+  border-radius: 100px;
+  cursor: pointer;
+  opacity: 0;
+  animation: rise-fade 1s 2s forwards;
+  transition: all 0.2s;
+}
+
+.celebration-close:hover {
+  background: var(--gold);
+  color: var(--navy-deep);
+}
+
+@keyframes rise-fade {
+  0% { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes zoom-in {
+  0% { opacity: 0; transform: scale(0.3); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* Confetti */
+.confetti {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  top: -20px;
+  animation: confetti-fall linear forwards;
+}
+
+@keyframes confetti-fall {
+  0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(110vh) rotate(720deg); opacity: 0.3; }
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .label::before, .label::after { display: none; }
+  .footer-stats { display: none; }
+  .brand-text p { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- HEADER -->
+  <header class="header">
+    <div class="brand">
+      <div class="brand-mark">
+        <svg viewBox="0 0 32 32"><path d="M16 4 L18 14 L28 16 L18 18 L16 28 L14 18 L4 16 L14 14 Z"/></svg>
+      </div>
+      <div class="brand-text">
+        <h1>Pirates Paradise</h1>
+        <p>Restaurant · Animation</p>
+      </div>
+    </div>
+    <button class="settings-btn" id="settingsBtn" title="Réglages">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+    </button>
+  </header>
+
+  <!-- MAIN -->
+  <main class="main">
+    <p class="label">Notre Trésor le plus précieux</p>
+
+    <div class="counter-wrap">
+      <div class="counter" id="counter">0</div>
+      <p class="target">Objectif&nbsp;: <strong>1 000 000</strong> de clients</p>
+    </div>
+
+    <div class="progress-container">
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+      <div class="progress-label">
+        <span id="progressPercent">0%</span>
+        <span id="remaining">1 000 000 restants</span>
+      </div>
+    </div>
+
+    <button class="click-btn" id="clickBtn">Ajouter un client</button>
+
+    <div class="footer-stats">
+      <div class="stat">
+        <div class="stat-label">Clics ce soir</div>
+        <div class="stat-value" id="sessionClicks">0</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Par clic</div>
+        <div class="stat-value" id="incrementDisplay">+1</div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- MODAL SETTINGS -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <h2>⚓ Réglages du compteur</h2>
+
+    <div class="field">
+      <label>Compteur actuel</label>
+      <input type="number" id="currentCount" min="0" />
+    </div>
+
+    <div class="field">
+      <label>Incrément par clic</label>
+      <input type="number" id="incrementInput" min="1" />
+    </div>
+
+    <div class="field">
+      <label>Objectif</label>
+      <input type="number" id="targetInput" min="1" />
+    </div>
+
+    <div class="field">
+      <label class="toggle">
+        <input type="checkbox" id="soundToggle" />
+        <span class="toggle-track"></span>
+        <span>Sons d'or</span>
+      </label>
+    </div>
+
+    <div class="modal-actions" style="margin-bottom: 12px;">
+      <button class="btn btn-ceremony" id="ceremonyBtn" style="flex: 1;">⚓ Mode cérémonie (999 990)</button>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-danger" id="resetBtn">Reset à 0</button>
+      <button class="btn btn-ghost" id="closeBtn">Annuler</button>
+      <button class="btn btn-primary" id="saveBtn">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- CELEBRATION -->
+<div class="celebration" id="celebration">
+  <p class="celebration-eyebrow">Ce soir, à Pirates Paradise</p>
+  <div class="celebration-number" id="celebrationNumber">1 000 000</div>
+  <h2 class="celebration-title">CLIENTS À BORD&nbsp;!</h2>
+  <p class="celebration-message">
+    Le trésor est ouvert, moussaillon&nbsp;!<br>
+    Un million de clients ont franchi nos portes —<br>
+    levons l'ancre vers le prochain million.
+  </p>
+  <button class="celebration-close" id="celebrationClose">Continuer l'aventure</button>
+</div>
+
+<script>
+// ===== STATE =====
+const STORAGE_KEY = 'pirates_paradise_counter';
+const DEFAULT_STATE = {
+  count: 999990,
+  increment: 1,
+  target: 1000000,
+  sound: true,
+  celebrated: false
+};
+
+let state = { ...DEFAULT_STATE };
+let sessionClicks = 0;
+
+// Tente de charger depuis window.storage si disponible (artifacts), sinon localStorage
+async function loadState() {
+  try {
+    if (typeof window.storage !== 'undefined') {
+      const result = await window.storage.get(STORAGE_KEY);
+      if (result && result.value) {
+        state = { ...DEFAULT_STATE, ...JSON.parse(result.value) };
+      }
+    } else if (typeof localStorage !== 'undefined') {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) state = { ...DEFAULT_STATE, ...JSON.parse(saved) };
+    }
+  } catch (e) {
+    console.log('Pas de sauvegarde précédente, démarrage par défaut');
+  }
+  render();
+}
+
+async function saveState() {
+  try {
+    const value = JSON.stringify(state);
+    if (typeof window.storage !== 'undefined') {
+      await window.storage.set(STORAGE_KEY, value);
+    } else if (typeof localStorage !== 'undefined') {
+      localStorage.setItem(STORAGE_KEY, value);
+    }
+  } catch (e) {
+    console.log('Sauvegarde indisponible');
+  }
+}
+
+// ===== FORMATTING =====
+function formatNumber(n) {
+  return n.toLocaleString('fr-FR').replace(/,/g, ' ');
+}
+
+// ===== RENDER =====
+function render() {
+  const counterEl = document.getElementById('counter');
+  const progressFill = document.getElementById('progressFill');
+  const progressPercent = document.getElementById('progressPercent');
+  const remaining = document.getElementById('remaining');
+  const incrementDisplay = document.getElementById('incrementDisplay');
+  const sessionClicksEl = document.getElementById('sessionClicks');
+
+  counterEl.textContent = formatNumber(state.count);
+  const pct = Math.min(100, (state.count / state.target) * 100);
+  progressFill.style.width = pct + '%';
+  progressPercent.textContent = pct.toFixed(2) + '%';
+  const left = Math.max(0, state.target - state.count);
+  remaining.textContent = left === 0 ? 'Objectif atteint !' : formatNumber(left) + ' restants';
+  incrementDisplay.textContent = '+' + state.increment;
+  sessionClicksEl.textContent = formatNumber(sessionClicks);
+}
+
+// ===== CLICK HANDLER =====
+const clickBtn = document.getElementById('clickBtn');
+const counterEl = document.getElementById('counter');
+
+clickBtn.addEventListener('click', (e) => {
+  const previousCount = state.count;
+  state.count += state.increment;
+  sessionClicks++;
+
+  // Animation bump
+  counterEl.classList.remove('bump');
+  void counterEl.offsetWidth;
+  counterEl.classList.add('bump');
+  setTimeout(() => counterEl.classList.remove('bump'), 150);
+
+  // Particules
+  spawnParticles(e.clientX, e.clientY);
+
+  // Son
+  if (state.sound) playClickSound();
+
+  // Vérifier célébration
+  if (previousCount < state.target && state.count >= state.target && !state.celebrated) {
+    state.celebrated = true;
+    setTimeout(triggerCelebration, 300);
+  }
+
+  saveState();
+  render();
+});
+
+// ===== PARTICLES =====
+function spawnParticles(x, y) {
+  const symbols = ['✦', '⚓', '★', '✧'];
+  for (let i = 0; i < 8; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+    p.style.color = Math.random() > 0.5 ? '#F69614' : '#32B6B0';
+    p.style.left = x + 'px';
+    p.style.top = y + 'px';
+    const angle = (Math.PI * 2 * i) / 8 + Math.random() * 0.5;
+    const dist = 80 + Math.random() * 60;
+    p.style.setProperty('--dx', Math.cos(angle) * dist + 'px');
+    p.style.setProperty('--dy', Math.sin(angle) * dist + 'px');
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), 1000);
+  }
+}
+
+// ===== SOUND (Web Audio API — pas de fichier externe) =====
+let audioCtx = null;
+function playClickSound() {
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(440, audioCtx.currentTime + 0.15);
+    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.2);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.2);
+  } catch (e) { /* fail silently */ }
+}
+
+function playCelebrationSound() {
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const notes = [523.25, 659.25, 783.99, 1046.50]; // Do Mi Sol Do
+    notes.forEach((freq, i) => {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, audioCtx.currentTime + i * 0.15);
+      gain.gain.setValueAtTime(0.15, audioCtx.currentTime + i * 0.15);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + i * 0.15 + 0.4);
+      osc.start(audioCtx.currentTime + i * 0.15);
+      osc.stop(audioCtx.currentTime + i * 0.15 + 0.4);
+    });
+  } catch (e) { /* fail silently */ }
+}
+
+// ===== CELEBRATION =====
+function triggerCelebration() {
+  const celebration = document.getElementById('celebration');
+  const celebrationNumber = document.getElementById('celebrationNumber');
+  celebrationNumber.textContent = formatNumber(state.target);
+  celebration.classList.add('show');
+
+  if (state.sound) playCelebrationSound();
+
+  // Confetti (200 particules)
+  for (let i = 0; i < 200; i++) {
+    setTimeout(() => spawnConfetti(), i * 15);
+  }
+
+  // 2e vague
+  setTimeout(() => {
+    for (let i = 0; i < 100; i++) {
+      setTimeout(() => spawnConfetti(), i * 20);
+    }
+  }, 2000);
+}
+
+function spawnConfetti() {
+  const colors = ['#F69614', '#32B6B0', '#FDF5E6', '#ffb14a'];
+  const c = document.createElement('div');
+  c.className = 'confetti';
+  c.style.left = Math.random() * 100 + '%';
+  c.style.background = colors[Math.floor(Math.random() * colors.length)];
+  c.style.animationDuration = (3 + Math.random() * 3) + 's';
+  c.style.transform = `rotate(${Math.random() * 360}deg)`;
+  if (Math.random() > 0.5) {
+    c.style.borderRadius = '50%';
+  } else if (Math.random() > 0.5) {
+    c.style.width = '8px';
+    c.style.height = '16px';
+  }
+  document.getElementById('celebration').appendChild(c);
+  setTimeout(() => c.remove(), 6000);
+}
+
+document.getElementById('celebrationClose').addEventListener('click', () => {
+  document.getElementById('celebration').classList.remove('show');
+});
+
+// ===== MODAL =====
+const modal = document.getElementById('modalOverlay');
+document.getElementById('settingsBtn').addEventListener('click', () => {
+  document.getElementById('currentCount').value = state.count;
+  document.getElementById('incrementInput').value = state.increment;
+  document.getElementById('targetInput').value = state.target;
+  document.getElementById('soundToggle').checked = state.sound;
+  modal.classList.add('show');
+});
+
+document.getElementById('closeBtn').addEventListener('click', () => {
+  modal.classList.remove('show');
+});
+
+modal.addEventListener('click', (e) => {
+  if (e.target === modal) modal.classList.remove('show');
+});
+
+document.getElementById('saveBtn').addEventListener('click', () => {
+  const newCount = parseInt(document.getElementById('currentCount').value);
+  const newIncrement = parseInt(document.getElementById('incrementInput').value);
+  const newTarget = parseInt(document.getElementById('targetInput').value);
+
+  if (!isNaN(newCount) && newCount >= 0) state.count = newCount;
+  if (!isNaN(newIncrement) && newIncrement >= 1) state.increment = newIncrement;
+  if (!isNaN(newTarget) && newTarget >= 1) state.target = newTarget;
+  state.sound = document.getElementById('soundToggle').checked;
+
+  // Si on remet le compteur sous l'objectif, on autorise une nouvelle célébration
+  if (state.count < state.target) state.celebrated = false;
+
+  saveState();
+  render();
+  modal.classList.remove('show');
+});
+
+document.getElementById('resetBtn').addEventListener('click', () => {
+  if (confirm('Remettre le compteur à zéro ? Cette action est irréversible.')) {
+    state = { ...DEFAULT_STATE, count: 0, celebrated: false };
+    sessionClicks = 0;
+    saveState();
+    render();
+    modal.classList.remove('show');
+  }
+});
+
+document.getElementById('ceremonyBtn').addEventListener('click', () => {
+  state.count = 999990;
+  state.celebrated = false;
+  sessionClicks = 0;
+  // Ferme aussi la célébration si elle était ouverte
+  document.getElementById('celebration').classList.remove('show');
+  saveState();
+  render();
+  modal.classList.remove('show');
+});
+
+// ===== KEYBOARD SHORTCUTS =====
+document.addEventListener('keydown', (e) => {
+  // Espace ou Entrée pour cliquer
+  if ((e.code === 'Space' || e.code === 'Enter') && !modal.classList.contains('show')) {
+    e.preventDefault();
+    clickBtn.click();
+  }
+  // Échap pour fermer modal
+  if (e.code === 'Escape') {
+    modal.classList.remove('show');
+    document.getElementById('celebration').classList.remove('show');
+  }
+});
+
+// ===== INIT =====
+loadState();
+</script>
+
+</body>
+</html>
